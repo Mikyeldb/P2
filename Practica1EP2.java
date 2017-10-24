@@ -51,8 +51,8 @@ public class Practica1EP2 {
         {
             int menu = menu(sc);                                                                //Esta función muestra el menú y permite elegir una opción
 
-            while (menu < 1 || menu > 8){                                                       //Esta parte comprueba que se introduce una opcion correcta
-                System.out.println("Debes introducir un valor entre 1 y 8.");                   //si no es asi, se vuelve a mostrar el menu
+            while (menu < 1 || menu > 9){                                                       //Esta parte comprueba que se introduce una opcion correcta
+                System.out.println("Debes introducir un valor entre 1 y 9.");                   //si no es asi, se vuelve a mostrar el menu
                 sc.nextLine();                                                                  //
                 menu = menu(sc);                                                                //
             }
@@ -414,7 +414,125 @@ public class Practica1EP2 {
                         System.out.print("Otros gastos actualizados correctamente en la motocicleta seleccionada. ");
                     
                     break;
-                case 8:                                                                         //SALIR DEL PROGRAMA CREANDO UN FICHERO DE TEXTO Y GUARDANDO EN EL///////////////////////
+                case 8: 
+                        int s, mot, desti, ori;
+                        ArrayList<Miembro> dest = new ArrayList<Miembro>();
+                    
+                        System.out.println("Selecciona un miembro para eliminarlo:");           //
+                        mostrarMiembrosYMotos(acama);
+
+                                                                                                //
+                        sc.nextLine();                                                          //
+                        try                                                                     //
+                        {                                                                       //
+                            s = sc.nextInt();                                              //
+                        }                                                                       //
+                        catch(Exception e){                                                     //
+                            s = -1;                                                        //  
+                        }                                                                       //
+                                                                                                //
+                        if (s < 1 || s > acama.getCantidadMiembros()){                     //   
+                            s = controlarValoresEnteros(s,1,acama.getCantidadMiembros(),   //
+                                    sc);                                                        //
+                        }
+                        
+                        if(acama.getMiembros().get(s - 1).calcularCantidadMotos() == 0)
+                        {
+                            acama.getMiembros().remove(s - 1);
+                        }
+                        else if(acama.getMiembros().get(s - 1).calcularCantidadMotos() > 0)
+                        {
+                            while(acama.getMiembros().get(s - 1).calcularCantidadMotos() > 0)
+                            {
+                                mostrarMotosDeUnMiembro(acama.getMiembros(), s- 1);
+                                
+                                System.out.println("Selecciona la moto que se va a ceder.");            //Se selecciona una de las motos del miembro origen para ser cedida.
+                                sc.nextLine();                                                          //
+                                try                                                                     //
+                                {                                                                       //
+                                    mot = sc.nextInt();                                                //
+                                }                                                                       //
+                                catch(Exception e){                                                     //
+                                    mot =-1;                                                           //
+                                }                                                                       //
+                                                                                                        //
+                                if (mot < 1 || mot > acama.getMiembros().get(s - 1).calcularCantidadMotos())                                       //
+                                {                                                                       //
+                                    moto = controlarValoresEnteros(mot,1,acama.getMiembros().get(s - 1).calcularCantidadMotos(),sc);               //                                             
+                                }
+                                
+                                dest = mostrarPosiblesMiembrosDestinoCesion(acama,             //
+                                s - 1, mot - 1   //
+                                    , acama.getCosteMaximo());                                  //
+                                
+                                if(dest.size() > 0)                                            //Si existe algun miembro capaz de guardar la moto que se quiere ceder sin superar
+                                {                                                                       //los 6000€...
+                                    System.out.println("Selecciona el miembro destino para la cesion"   //Se selecciona uno de los posibles miembros destino.
+                                            + "(usa el numero entre parentesis "                        //
+                                            + "no el numero de socio).");                               //
+                                    sc.nextLine();                                                      //
+                                    try                                                                 //
+                                    {                                                                   //
+                                        desti = sc.nextInt();                                         //
+                                    }                                                                   //
+                                    catch(Exception e){                                                 //
+                                        desti =-1;                                                    //
+                                    }                                                                   //
+                                                                                                        //
+                                    if (desti < 1 || desti > dest.size())                  //
+                                    {                                                                   //
+                                        desti = controlarValoresEnteros(desti,1,                    //
+                                                dest.size(),sc);                               //                             
+                                    }                                                                   //
+                                                                                                        //
+                                    desti = (dest.get(desti - 1).getNumSocio() -1);        //
+                                                                                                        //
+                                    ori = s - 1;       //
+                                                                                                        //
+                                    mot--;                                                             //
+                                                                                                        //
+                                    System.out.println("Cesion realizada correctamente.");              //Se muestra la correcta realizacion de la cesion.
+                                    System.out.println("La "+acama                                      //
+                                        .getMiembros().get(ori).getMotos()                           //    
+                                        .get(mot).toString()                                           //
+                                        +"ha sido cedida por el "+acama.getMiembros()                   //
+                                                .get(ori).toString()+                                //
+                                        "y ahora dispone de ella el "+acama.getMiembros()               //
+                                                .get(desti).toString());                              //
+                                                                                                        //            
+                                    Date fecha = new Date();                                            //
+                                                                                                        //
+                                    Cesion c = new Cesion(acama.getMiembros().get(ori).              //Se crea la cesion.
+                                                    getMotos().get(mot),                               //
+                                            acama.getMiembros().get(ori),                            //
+                                            acama.getMiembros().get(desti), fecha);                   //
+                                                                                                        //
+                                    acama.registrarCesion(c);                                           //Se guarda la cesion en el array de cesiones de acama.
+                                                                                                        //
+                                    acama.getMiembros().get(desti).getMotos()                         //Se guarda la moto a ceder en el array de motos del miembro destino
+                                            .add(acama.getMiembros().get(ori).                       //(ahora posee la moto).
+                                                    getMotos().get(mot));                              //
+                                    acama.getMiembros().get(ori).getMotos()                          //Se elimina la moto a ceder del array de motos del miembro origen
+                                            .remove(acama.getMiembros().get(ori).                    //(ya no posee la moto).
+                                                    getMotos().get(mot));                              //
+                                                                                                        //
+                                    acama.getMiembros().get(desti).getMotos().get((acama.getMiembros()//Se le cambia a la moto cedida el el numero de miembro por el del nuevo
+                                            .get(desti).getMotos().size() - 1)).setSocio(desti + 1);//miembro que la posee.
+                                                                                                        //
+                                }
+                                else
+                                {
+                                    acama.getMiembros().get(s - 1).getMotos().remove(mot - 1);
+                                }
+
+                                
+                            }
+                            
+                            acama.getMiembros().remove(s - 1);
+                        }
+                    
+                    break;
+                case 9:                                                                                //SALIR DEL PROGRAMA CREANDO UN FICHERO DE TEXTO Y GUARDANDO EN EL///////////////////////
                                                                                                 //LA INFORMACION DE LOS MIEMBROS, SUS MOTOS Y LAS CESIONES REALIZADAS////////////////////
                     generarFichero(acama, sc);                                                  //Genera un fichero que guarda la informacion de los miembros, sus motos
                                                                                                 //y las cesiones realizadas. Despues finaliza el programa.
@@ -439,7 +557,8 @@ public class Practica1EP2 {
         System.out.println("5. Listar todas las motos");                                        //
         System.out.println("6. Mostrar las cesiones realizadas");                               //
         System.out.println("7. Incrementar otros gastos a una moto");                           //
-        System.out.println("8. Salir del programa");                                            //
+        System.out.println("8. Eliminar miembro");                                              //
+        System.out.println("9. Salir del programa");                                            //
                                                                                                 //
         try{                                                                                    //
             numMenu = sc.nextInt();                                                             //
