@@ -51,8 +51,8 @@ public class Practica1EP2 {
         {
             int menu = menu(sc);                                                                //Esta función muestra el menú y permite elegir una opción
 
-            while (menu < 1 || menu > 9){                                                       //Esta parte comprueba que se introduce una opcion correcta
-                System.out.println("Debes introducir un valor entre 1 y 9.");                   //si no es asi, se vuelve a mostrar el menu
+            while (menu < 1 || menu > 10){                                                       //Esta parte comprueba que se introduce una opcion correcta
+                System.out.println("Debes introducir un valor entre 1 y 10.");                   //si no es asi, se vuelve a mostrar el menu
                 sc.nextLine();                                                                  //
                 menu = menu(sc);                                                                //
             }
@@ -532,7 +532,16 @@ public class Practica1EP2 {
                         }
                     
                     break;
-                case 9:                                                                                //SALIR DEL PROGRAMA CREANDO UN FICHERO DE TEXTO Y GUARDANDO EN EL///////////////////////
+                case 9:
+                    ArrayList<Miembro> maxc = acama.miembrosConMasCesiones();
+                    
+                    for(int h = 0; h < maxc.size(); h++)
+                    {
+                        System.out.println(maxc.get(h).toString());
+                        mostrarMotosDeUnMiembro(maxc, h);
+                    }
+                    break;
+                case 10:                                                                                //SALIR DEL PROGRAMA CREANDO UN FICHERO DE TEXTO Y GUARDANDO EN EL///////////////////////
                                                                                                 //LA INFORMACION DE LOS MIEMBROS, SUS MOTOS Y LAS CESIONES REALIZADAS////////////////////
                     generarFichero(acama, sc);                                                  //Genera un fichero que guarda la informacion de los miembros, sus motos
                                                                                                 //y las cesiones realizadas. Despues finaliza el programa.
@@ -558,7 +567,8 @@ public class Practica1EP2 {
         System.out.println("6. Mostrar las cesiones realizadas");                               //
         System.out.println("7. Incrementar otros gastos a una moto");                           //
         System.out.println("8. Eliminar miembro");                                              //
-        System.out.println("9. Salir del programa");                                            //
+        System.out.println("9. Miembros con mas cesiones");                                     //
+        System.out.println("10. Salir del programa");                                           //
                                                                                                 //
         try{                                                                                    //
             numMenu = sc.nextInt();                                                             //

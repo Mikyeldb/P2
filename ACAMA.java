@@ -16,6 +16,7 @@ public class ACAMA {
     private ArrayList<Moto> motos;
     private ArrayList<Cesion> cesiones;
     private ArrayList<Miembro> miembros;
+    private float costeMaximo = 0;
     
     public ACAMA(){
         motos = new ArrayList<Moto>();
@@ -58,5 +59,45 @@ public class ACAMA {
 
     public ArrayList<Moto> getMotos (){
         return motos;
+    }
+    
+    public void setCosteMaximo(float costeMaximo) 
+    {
+        this.costeMaximo = costeMaximo;
+    }
+
+    public float getCosteMaximo() 
+    {
+        return costeMaximo;
+    }
+    
+    
+    public ArrayList<Miembro> miembrosConMasCesiones()
+    {
+        ArrayList<Miembro> miembrosMasCesiones = new ArrayList<Miembro>();
+        int motosCedidas = 0;
+        for (int i = 0; i < miembros.size(); i++)
+        {
+            int motos = 0;
+            for(int  j = 0; j < cesiones.size(); j++)
+            {
+                if(miembros.get(i).getNumSocio() == cesiones.get(j).getMiembroDestino().getNumSocio())
+                {
+                    motos++;
+                }
+
+                if(motos > motosCedidas)
+                {
+                    motosCedidas = motos; 
+                    miembrosMasCesiones.clear();
+                    miembrosMasCesiones.add(miembros.get(i));
+                }
+                else if(motos == motosCedidas)
+                {
+                        miembrosMasCesiones.add(miembros.get(i));
+                }
+            }
+        }
+        return miembrosMasCesiones;
     }
 }
