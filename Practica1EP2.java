@@ -605,9 +605,9 @@ public class Practica1EP2 {
                 {                                                                               //
                     escribir.write("Cesion "+(i+1)+":\r\n");                                    //    
                     escribir.write("    "+acama.getCesiones().get(i).toString());               //
+                    escribir.write("\r\n\r\n");                                                 //
                 }                                                                               //
                                                                                                 //
-                escribir.write("\r\n\r\n");                                                     //
             }                                                                                   //
                                                                                                 //
             escribir.close();                                                                   //
