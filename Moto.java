@@ -35,8 +35,7 @@ public class Moto {
     }
     
     
-    public void setSocio(int s)
-    {
+    public void setSocio(int s){
         socio = s;
     }
     
