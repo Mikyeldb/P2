@@ -18,15 +18,17 @@ public class Moto {
     private final float coste;
     private String matricula;
     private int socio;
+    private int otrosGastos;
     
     
-    public Moto(String modelo, int caballos, float coste, String matricula){
+    public Moto(String modelo, int caballos, float coste, String matricula, int g){
         
         this.modelo = modelo;
         this.caballos = caballos;
         this.coste = coste;
         this.matricula = matricula;
         socio = 0;
+        otrosGastos = g;
     }
     
     @Override
@@ -57,5 +59,17 @@ public class Moto {
     
     public String getMatricula(){
         return matricula;
+    }
+    
+    public int getOtrosGastos(){
+        return otrosGastos;
+    }
+    
+    public void anyadirOtrosGastos(int f){
+        otrosGastos += f;
+    }
+    
+    public void setOtrosGastos(int f){
+        otrosGastos = f;
     }
 }

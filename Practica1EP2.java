@@ -27,12 +27,32 @@ public class Practica1EP2 {
         Scanner sc = new Scanner(System.in);                                                    //
         boolean salir = false;                                                                  //
         
+        
+        float costeMaximo = -1;
+        while(costeMaximo == -1)
+        {
+            try                                                                    
+            {
+                System.out.print("Introduce un coste maximo para todos los miembros: ");
+                costeMaximo = sc.nextFloat();
+            }
+            catch(Exception e)
+            {
+                System.out.print("\nError al introducir el coste, vuelva a intentarlo. ");
+                costeMaximo = -1;
+            }
+            sc.nextLine(); 
+        }
+        
+        acama.setCosteMaximo(costeMaximo);
+        
+        
         do
         {
             int menu = menu(sc);                                                                //Esta función muestra el menú y permite elegir una opción
 
-            while (menu < 1 || menu > 7){                                                       //Esta parte comprueba que se introduce una opcion correcta
-                System.out.println("Debes introducir un valor entre 1 y 7.");                   //si no es asi, se vuelve a mostrar el menu
+            while (menu < 1 || menu > 8){                                                       //Esta parte comprueba que se introduce una opcion correcta
+                System.out.println("Debes introducir un valor entre 1 y 8.");                   //si no es asi, se vuelve a mostrar el menu
                 sc.nextLine();                                                                  //
                 menu = menu(sc);                                                                //
             }
@@ -54,7 +74,7 @@ public class Practica1EP2 {
                                                                                                 //
                     float coste;                                                                //
                     String modelo, matricula;                                                   //  
-                    int caballos, select;                                                       //
+                    int caballos, select, otrosgastos;                                                       //
                     ArrayList<Miembro> destinos = new ArrayList<Miembro>();                     //
                                                                                                 //
                     if(acama.getCantidadMiembros() == 0)                                        //si no existen miembros registrados...
@@ -80,7 +100,7 @@ public class Practica1EP2 {
                         if(coste < 0 || coste > 1000000000)                                     //
                             coste = controlarValoresEnteros((int)coste, 0, 1000000000, sc);     //
                                                                                                 //
-                        if(!motoAlmacenable(acama,coste))                                       //si existen miebros registrados pero ninguno puede guardar la moto
+                        if(!motoAlmacenable(acama,coste, acama.getCosteMaximo()))               //si existen miebros registrados pero ninguno puede guardar la moto
                         {                                                                       //sin exceder los 6000€...
                             System.out.println("No hay ningun miembro regitrado en "            //Se cancela el registro de la motocicleta.    
                                     + "la asociacion ACAMA que pueda guardar esta moto "        //
@@ -124,14 +144,28 @@ public class Practica1EP2 {
                                 }                                                               //
                                 matricula = sc.nextLine();                                      //
                                 repetida = matriculaRepetida(acama, matricula);                 //
+                            }                                                                   
+                            
+                            System.out.println("Introduce otros gastos para la motocicleta:");  //
+                            try                                                                 //
+                            {                                                                   //
+                                otrosgastos = sc.nextInt();                                     //
                             }                                                                   //
+                            catch(Exception e){                                                 //
+                                otrosgastos = -1;                                               //    
+                            }                                                                   //
+                                                                                                //    
+                            if(otrosgastos < 0 || otrosgastos > 1000000)                        //
+                                otrosgastos = controlarValoresEnteros(otrosgastos,
+                                        0, 1000000, sc);                                        //
                                                                                                 //
                                                                                                 //
-                            Moto moto = new Moto(modelo,caballos,coste,matricula);              //Se crea la moto.
+                            Moto moto = new Moto(modelo,caballos,coste,matricula,otrosgastos);  //Se crea la moto.
                                                                                                 //
                             acama.registrarMoto(moto);                                          //Se guarda la moto en el array de motos de acama. 
                                                                                                 //
-                            destinos = mostrarPosiblesMiembros(acama, coste);                   //Se calculan los miembros registrados que pueden almacenar la moto.
+                            destinos = mostrarPosiblesMiembros(acama, coste,                    //Se calculan los miembros registrados que pueden almacenar la moto.
+                                    acama.getCosteMaximo());                                    //
                                                                                                 //
                             if (destinos.size() > 0)                                            //Si existe algun miembro registrado capaz de almacenar la moto...
                             {                                                                   //
@@ -229,10 +263,11 @@ public class Practica1EP2 {
                         }                                                                       //
                                                                                                 //
                         System.out.println("Miembros a los que se les puede ceder la moto sin"  //Se muestran los miembros de la asociacion que pueden guardar la moto que se quiere
-                                + " superar el limite de 6000€:");                              //ceder sin superar los 6000€
+                                + " superar el limite de "+acama.getCosteMaximo()+"€:");        //ceder sin superar los 6000€
                                                                                                 //
                         destinatarios = mostrarPosiblesMiembrosDestinoCesion(acama,             //
-                                (miembrosConMoto.get(origen - 1).getNumSocio() - 1), moto - 1); //
+                                (miembrosConMoto.get(origen - 1).getNumSocio() - 1), moto - 1   //
+                                    , acama.getCosteMaximo());                                  //
                                                                                                 //
                                                                                                 //
                         if(destinatarios.size() > 0)                                            //Si existe algun miembro capaz de guardar la moto que se quiere ceder sin superar
@@ -327,8 +362,59 @@ public class Practica1EP2 {
                                                                                                 //
                     break;                                                                      /////////////////////////////////////////////////////////////////////////////////////////
                     
-                
-                case 7:                                                                         //SALIR DEL PROGRAMA CREANDO UN FICHERO DE TEXTO Y GUARDANDO EN EL///////////////////////
+                case 7:
+                    
+                    int nuevogasto, m, idmiembro;
+                    
+                    mostrarTodasLasMotosYSuMiembro(acama);
+                    
+                    System.out.println("Selecciona la moto a la que añadir el gasto.");         //
+                        sc.nextLine();                                                          //
+                        try                                                                     //
+                        {                                                                       //
+                            m = sc.nextInt();                                                //
+                        }                                                                       //
+                        catch(Exception e){                                                     //
+                            m =-1;                                                           //
+                        }                                                                       //
+                                                                                                //
+                        if (m < 1 || m > acama.getCantidadMotos())                                       //
+                        {                                                                       //
+                            m = controlarValoresEnteros(m,1,acama.getCantidadMotos(),sc);               //                                             
+                        }  
+                    
+                        try                                                                    
+                        {
+                            System.out.print("Introduce un incremento de otros gastos para la motocicleta: ");
+                            nuevogasto = sc.nextInt();
+                        }
+                        catch(Exception e)
+                        {
+                            nuevogasto = -1;
+                        }
+                        sc.nextLine(); 
+                        
+                        if (nuevogasto < 1 || nuevogasto > 1000000){                     //   
+                            origen = controlarValoresEnteros(nuevogasto,1,1000000,   //
+                                    sc);                                                        //
+                        }
+                        
+                        acama.getMotos().get(m - 1).anyadirOtrosGastos(nuevogasto);
+                        
+                        idmiembro = acama.getMotos().get(m - 1).getSocio();
+                        
+                        for (int k = 0; k < acama.getMiembros().get(idmiembro).calcularCantidadMotos(); k++)
+                        {
+                            if(acama.getMiembros().get(idmiembro).getMotos().get(k).getModelo().equals(acama.getMotos().get(m - 1).getModelo()))
+                            {
+                                acama.getMiembros().get(idmiembro).getMotos().get(k).setOtrosGastos(acama.getMotos().get(m - 1).getOtrosGastos());
+                            }
+                        }
+                        
+                        System.out.print("Otros gastos actualizados correctamente en la motocicleta seleccionada. ");
+                    
+                    break;
+                case 8:                                                                         //SALIR DEL PROGRAMA CREANDO UN FICHERO DE TEXTO Y GUARDANDO EN EL///////////////////////
                                                                                                 //LA INFORMACION DE LOS MIEMBROS, SUS MOTOS Y LAS CESIONES REALIZADAS////////////////////
                     generarFichero(acama, sc);                                                  //Genera un fichero que guarda la informacion de los miembros, sus motos
                                                                                                 //y las cesiones realizadas. Despues finaliza el programa.
@@ -352,7 +438,8 @@ public class Practica1EP2 {
         System.out.println("4. Listar en pantalla los miembros y sus motos");                   //
         System.out.println("5. Listar todas las motos");                                        //
         System.out.println("6. Mostrar las cesiones realizadas");                               //
-        System.out.println("7. Salir del programa");                                            //
+        System.out.println("7. Incrementar otros gastos a una moto");                           //
+        System.out.println("8. Salir del programa");                                            //
                                                                                                 //
         try{                                                                                    //
             numMenu = sc.nextInt();                                                             //
@@ -366,7 +453,7 @@ public class Practica1EP2 {
     }                                                                                           //
     
     
-    public static boolean motoAlmacenable(ACAMA a, float coste){                                //FUNCION motoAlmacenable
+    public static boolean motoAlmacenable(ACAMA a, float coste, float costeMax){                //FUNCION motoAlmacenable
                                                                                                 //Parametros: ACAMA, float
         boolean res = false;                                                                    //Return: boolean
         float precio;                                                                           //
@@ -375,7 +462,7 @@ public class Practica1EP2 {
             precio = a.getMiembros().get(i).calcularPrecioMotos();                              //
             precio += coste;                                                                    //
                                                                                                 //
-            if(precio <= 6000)                                                                  //
+            if(precio <= costeMax)                                                                  //
                 res = true;                                                                     //
         }                                                                                       //
                                                                                                 //
@@ -488,7 +575,7 @@ public class Practica1EP2 {
 
     
     public static ArrayList<Miembro> mostrarPosiblesMiembrosDestinoCesion(ACAMA acama,          //FUNCION mostrarPosiblesMiembrosDestinoCesion
-            int origen, int moto){                                                              //Parametros: ACAMA, int, int
+            int origen, int moto, float costeMax){                                              //Parametros: ACAMA, int, int
                                                                                                 //Return: ArrayList<Miembro>
         ArrayList<Miembro> destinatarios = new ArrayList<Miembro>();                            //
         int i, cont = 1;                                                                        //Esta funcion muestra los miembros que a los que se les puede ceder
@@ -500,7 +587,7 @@ public class Practica1EP2 {
             precio = acama.getMiembros().get(i).calcularPrecioMotos();                          //
             precio += precioOrigen;                                                             //
                                                                                                 //
-            if(precio <= 6000 && i != origen)                                                   //
+            if(precio <= costeMax && i != origen)                                               //
             {                                                                                   //
                 System.out.println(acama.getMiembros().get(i).toString()+"(introduce "          //
                         +cont+").");                                                            //
@@ -513,7 +600,7 @@ public class Practica1EP2 {
         if(!existe)                                                                             //
         {                                                                                       //
             System.out.println("Ningun miembro puede aceptar esta moto sin superar"             //
-                    + " los 6000€.");                                                           //
+                    + " los "+acama.getCosteMaximo()+"€.");                                     //
         }                                                                                       //
         return destinatarios;                                                                   //
     }                                                                                           //
@@ -521,7 +608,8 @@ public class Practica1EP2 {
     
     
     
-    public static ArrayList<Miembro> mostrarPosiblesMiembros(ACAMA acama, float coste){         //FUNCION mostrarPosiblesMiembros
+    public static ArrayList<Miembro> mostrarPosiblesMiembros(ACAMA acama, float coste,          //FUNCION mostrarPosiblesMiembros
+            float costeMax){                                                                    //
                                                                                                 //Parametros: ACAMA, float
         int i, cont = 1;                                                                        //Return: ArrayList<Miembro>
         float precio;                                                                           //
@@ -532,7 +620,7 @@ public class Practica1EP2 {
             precio = acama.getMiembros().get(i).calcularPrecioMotos();                          //
             precio += coste;                                                                    //
                                                                                                 //
-            if(precio <= 6000)                                                                  //
+            if(precio <= costeMax)                                                              //
             {                                                                                   //
                 System.out.println("    "+acama.getMiembros().get(i).toString()+"(introduce "   //
                         +cont+").");                                                            //
